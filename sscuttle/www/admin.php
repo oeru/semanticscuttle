@@ -83,7 +83,7 @@ if ($action
 }
 
 $templatename = 'admin.tpl';
-$users =& $userservice->getObjectUsers();
+$users = $userservice->getObjectUsers();
 
 if ( !is_array($users) ) {
 	$users = array();

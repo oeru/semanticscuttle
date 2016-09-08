@@ -173,7 +173,7 @@ class SemanticScuttle_Service_Tag2Tag extends SemanticScuttle_DbService
             $query.= " AND uId = '".intval($uId)."'";
         }
         //die($query);
-        if (! ($dbresult =& $this->db->sql_query($query)) ){
+        if (! ($dbresult = $this->db->sql_query($query)) ){
             message_die(GENERAL_ERROR, 'Could not get related tags', '', __LINE__, __FILE__, $query, $this->db);
             return false;
         }
@@ -337,7 +337,7 @@ class SemanticScuttle_Service_Tag2Tag extends SemanticScuttle_DbService
             $query.= " ORDER BY count DESC";
             $query.= " LIMIT 0, " . intval($GLOBALS['maxSizeMenuBlock']);
 
-            if (! ($dbresult =& $this->db->sql_query($query)) ){
+            if (! ($dbresult = $this->db->sql_query($query)) ){
                 message_die(GENERAL_ERROR, 'Could not get linked tags', '', __LINE__, __FILE__, $query, $this->db);
                 return false;
             }

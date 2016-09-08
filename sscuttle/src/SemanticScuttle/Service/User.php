@@ -120,12 +120,12 @@ class SemanticScuttle_Service_User extends SemanticScuttle_DbService
         if($nb>0) {
             $query .= ' LIMIT 0, '.$nb;
         }
-        if (! ($dbresult =& $this->db->sql_query($query)) ) {
+        if (! ($dbresult = $this->db->sql_query($query)) ) {
             message_die(GENERAL_ERROR, 'Could not get user', '', __LINE__, __FILE__, $query, $this->db);
             return false;
         }
 
-        while ($row = & $this->db->sql_fetchrow($dbresult)) {
+        while ($row = $this->db->sql_fetchrow($dbresult)) {
             $users[] = $row;
         }
         $this->db->sql_freeresult($dbresult);
@@ -149,7 +149,7 @@ class SemanticScuttle_Service_User extends SemanticScuttle_DbService
             $query .= ' LIMIT 0, ' . intval($nb);
         }
 
-        if (! ($dbresult =& $this->db->sql_query($query)) ) {
+        if (! ($dbresult = $this->db->sql_query($query)) ) {
             message_die(
                 GENERAL_ERROR, 'Could not get user',
                 '', __LINE__, __FILE__, $query, $this->db
@@ -158,7 +158,7 @@ class SemanticScuttle_Service_User extends SemanticScuttle_DbService
         }
 
         $users = array();
-        while ($row = & $this->db->sql_fetchrow($dbresult)) {
+        while ($row = $this->db->sql_fetchrow($dbresult)) {
             $users[] = new SemanticScuttle_Model_User(
                 $row[$this->getFieldName('primary')],
                 $row[$this->getFieldName('username')]
