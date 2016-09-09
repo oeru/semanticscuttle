@@ -14,7 +14,7 @@ if($GLOBALS['enableGoogleCustomSearch'] == false) {
 }
 
 /* Service creation: only useful services are created */
-$bookmarkservice =SemanticScuttle_Service_Factory::get('Bookmark');
+$bookmarkservice = SemanticScuttle_Service_Factory::get('Bookmark');
 
 
 /*
@@ -36,7 +36,7 @@ else
 $tag = NULL;
 
 // Get the posts relevant to the passed-in variables.
-$bookmarks =& $bookmarkservice->getBookmarks(0, NULL, NULL, $tag, NULL, getSortOrder());
+$bookmarks = $bookmarkservice->getBookmarks(0, NULL, NULL, $tag, NULL, getSortOrder());
 
 
 // Set up the plain file and output all the posts.

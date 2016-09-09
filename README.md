@@ -3,6 +3,10 @@ Our own fork of Semantic Scuttle, so we can address PHP 5.4+ compatibility issue
 
 This project, like the original Semantic Scuttle, is licensed under the GPL v2 - see sscuttle/doc/LICENSE.txt
 
+You need to make sure that the sscuttle directory (which holds the source of Semantic Scuttle version 0.98.5) is readable by your webserver user - in our case that's www-data, so you have to go into your project directory and run:
+
+`sudo chown -R www-data:www-data sscuttle`
+
 Hosting stack: we're running this on an Ubuntu 14.04 server, using Nginx as the webserver (with Let's Encrypt SSL certs) and PHP5-fpm for PHP. I've included examples of the relevant configuration files in the nginx and php5 directories. 
 
 The nginx php-handler we use below assumes that you have a specific configuration for PHP5's fpm variant, so we've included the php-handler.conf file you need. Move it to the right place:

@@ -41,7 +41,7 @@ function filter($data, $type = NULL) {
 		}
 	} else if (is_array($data)) {
 		foreach(array_keys($data) as $key) {
-			$row =& $data[$key];
+			$row = $data[$key];
 			$row = filter($row, $type);
 		}
 	}
@@ -86,7 +86,7 @@ function getSortOrder($override = NULL) {
 function multi_array_search($needle, $haystack) {
 	if (is_array($haystack)) {
 		foreach(array_keys($haystack) as $key) {
-			$value =& $haystack[$key];
+			$value = $haystack[$key];
 			$result = multi_array_search($needle, $value);
 			if (is_array($result)) {
 				$return = $result;
