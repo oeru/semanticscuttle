@@ -1,0 +1,28 @@
+Running SemanticScuttle unit tests
+==================================
+
+Prerequisites
+-------------
+The unit tests use PHPUnit.
+For installation instructions, see http://phpunit.de/
+
+
+Warning
+-------
+The unit tests are DESTRUCTIBLE! Never ever run them on your
+normal SemanticScuttle database! Always use a different database
+for testing - whole tables are emptied and re-filled during the
+tests, and you will definitely lose all data in there.
+
+
+Running the tests
+-----------------
+To run a single test class, execute it like a normal php script:
+ php tests/BookmarkTest.php
+
+To run *all* the tests, run
+ php tests/AllTests.php
+
+If you want features like code coverage, you need to use
+the phpunit executable:
+ phpunit --coverage-html /tmp/sc-coverage/ tests/AllTests.php

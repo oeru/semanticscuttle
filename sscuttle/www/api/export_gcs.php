@@ -14,7 +14,7 @@ if($GLOBALS['enableGoogleCustomSearch'] == false) {
 }
 
 /* Service creation: only useful services are created */
-$bookmarkservice = SemanticScuttle_Service_Factory::get('Bookmark');
+$bookmarkservice =SemanticScuttle_Service_Factory::get('Bookmark');
 
 
 /*

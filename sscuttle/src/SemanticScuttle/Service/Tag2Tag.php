@@ -43,9 +43,9 @@ class SemanticScuttle_Service_Tag2Tag extends SemanticScuttle_DbService
     }
 
 
-    function __construct(&$db)
+    function __construct($db)
     {
-        $this->db = $db;
+        $this->db =$db;
         $this->tablename = $GLOBALS['tableprefix'] .'tags2tags';
     }
 

@@ -1,7 +1,12 @@
-ChangeLog for SemantiScuttle
-============================
+ChangeLog for SemanticScuttle
+=============================
 
 .. contents::
+
+0.98.6 - 2013-XX-XX
+-------------------
+- Fix bug #161: URLs broken on 1&1 server
+
 
 0.98.5 - 2013-03-20
 -------------------

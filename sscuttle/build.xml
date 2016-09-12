@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="SemanticScuttle" default="zip" basedir=".">
+  <!--
+    SemanticScuttle phing build file.
+    This script should provide a one-stop tool for all administrative
+    tasks around SemanticScuttle, like creating a release version,
+    tagging a release, running unit tests etc.
+  -->
+  <property file="build.properties" />
+  <property file="html.properties" />
+
+  <property name="version-m"  value="0.98" />
+  <property name="version"    value="0.98.5" />
+  <property name="stability"  value="beta" />
+  <property name="releasenotes" value="
+- Fix bug #109: preserve privacy setting from Delicious export files
+  (Thanks to David Glenck)
+- Fix bug #110: Document solution for &quot;searching slashes&quot;
+- Fix bug #111: Comments in config.php mention *.inc.php files
+  (José María Mateos [rinze])
+- Fix bug: Do not use eregi functions anymore
+" />
+  <property name="zipfile"     value="${phing.project.name}-${version}.zip" />
+  <property name="pkgfile"     value="${phing.project.name}-${version}.tgz" />
+  <property name="distfile"    value="dist/${zipfile}" />
+  <property name="distpkgfile" value="dist/pear/${pkgfile}" />
+  <property name="sfproject"   value="SemanticScuttle" />
+  <property name="sffilepath"  value="s/se/semanticscuttle/" />
+  <property name="svnpath"     value="https://semanticscuttle.svn.sourceforge.net/svnroot/semanticscuttle/" />
+
+  <fileset id="fs.zip" dir=".">
+   <include name="data/**"/>
+   <include name="doc/**"/>
+   <include name="src/**"/>
+   <include name="www/**"/>
+   <include name="scripts/avahi-export.php"/>
+   <include name="scripts/fix-unfiled-tags.php"/>
+   <exclude name="**/.gitignore/"/>
+   <exclude name="**/.svn/"/>
+   <exclude name="data/config.php"/>
+   <exclude name="data/config.testing.php"/>
+   <exclude name="data/config.testing-tmp.php"/>
+   <exclude name="data/locales/messages.po"/>
+   <exclude name="data/locales/*/LC_MESSAGES/messages.po"/>
+   <exclude name="src/php-gettext/examples/" />
+   <exclude name="src/php-gettext/tests/"/>
+  </fileset>
+
+  <fileset id="fs.doc" dir="doc">
+   <include name="ChangeLog"/>
+   <include name="**.txt"/>
+   <include name="**.rst"/>
+   <include name="**/*.rst"/>
+   <exclude name="LICENSE.txt"/>
+   <exclude name="developers/TODO.rst"/>
+   <exclude name="allinone.rst"/>
+  </fileset>
+
+  <taskdef name="rST" classname="phing.tasks.ext.rSTTask" />
+  <taskdef name="d51pearpkg2" classname="phing.tasks.ext.d51PearPkg2Task" />
+
+  <target name="zip" depends="check"
+   description="Create zip file for release"
+   >
+    <!--
+      The release file is for end users, so it is safe to
+      remove anything developer-related.
+
+      Test your zip with: unzip -l SemanticScuttle-0.95.0.zip
+    -->
+    <echo msg="Creating distribution zip for SemanticScuttle ${version}"/>
+    <delete file="${distfile}" failonerror="false"/>
+    <zip destfile="${distfile}" prefix="${phing.project.name}-${version}/">
+     <fileset refid="fs.zip"/>
+    </zip>
+  </target>
+
+
+
+  <target name="package" depends="check"
+   description="Creates the pear package"
+  >
+   <d51pearpkg2 dir="." baseinstalldir="/">
+     <name>SemanticScuttle</name>
+     <summary>A social bookmarking tool</summary>
+     <description>
+       A social bookmarking tool experimenting with new features
+       like structured tags or collaborative descriptions of tags.
+     </description>
+     <channel>semanticscuttle.sourceforge.net</channel>
+
+     <lead user="cweiske" name="Christian Weiske" email="cweiske@cweiske.de" />
+     <license>GPL</license>
+
+     <version   release="${version}"   api="${version}" />
+     <stability release="${stability}" api="${stability}" />
+
+     <notes>${releasenotes}</notes>
+
+     <dependencies>
+       <php minimum_version="5.2.0" />
+       <pear minimum_version="1.8.1" />
+
+       <package name="HTML_QuickForm2"
+                channel="pear.php.net"
+                minimum_version="0.4.0"
+                />
+       <!-- unit tests: -->
+       <package name="HTML_Request2"
+                channel="pear.php.net"
+                minimum_version="2.0.0"
+                />
+       <package name="Stream_Var"
+                channel="pear.php.net"
+                minimum_version="1.1.0"
+                />
+
+     </dependencies>
+
+     <!-- map directory (key) to role -->
+     <dirroles key="www">www</dirroles>
+     <dirroles key="data">data</dirroles>
+     <dirroles key="doc">doc</dirroles>
+     <dirroles key="scripts">doc</dirroles>
+     <dirroles key="src">php</dirroles>
+     <dirroles key="tests">test</dirroles>
+
+     <!-- do not add the following files to the package.
+          copied from excludes above -->
+     <ignore>**/.gitignore</ignore>
+     <ignore>**/.svn</ignore>
+     <ignore>build*</ignore>
+     <ignore>data/config.php</ignore>
+     <ignore>data/config.testing.php</ignore>
+     <ignore>data/config.testing-tmp.php</ignore>
+     <ignore>data/locales/messages.po</ignore>
+     <ignore>data/locales/*/LC_MESSAGES/messages.po</ignore>
+     <ignore>dist/**</ignore>
+     <ignore>src/php-gettext/examples/**</ignore>
+     <ignore>src/php-gettext/tests/**</ignore>
+     <ignore>*.properties</ignore>
+     <ignore>semanticscuttle-dump.sql</ignore>
+     <ignore>*.tgz</ignore>
+
+     <replacement path="src/SemanticScuttle/header.php"
+      type="pear-config" from="@data_dir@" to="data_dir"
+      />
+     <replacement path="src/SemanticScuttle/header.php"
+      type="pear-config" from="@www_dir@" to="www_dir"
+      />
+     <replacement path="src/SemanticScuttle/Config.php"
+      type="pear-config" from="@data_dir@" to="data_dir"
+      />
+     <replacement path="src/SemanticScuttle/Config.php"
+      type="pear-config" from="@www_dir@" to="www_dir"
+      />
+     <replacement path="www/www-header.php"
+      type="pear-config" from="@data_dir@" to="data_dir"
+      />
+     <replacement path="tests/prepare.php"
+      type="pear-config" from="@data_dir@" to="data_dir"
+      />
+
+     <changelog version="0.98.5" date="2013-03-20" license="GPL">
+- Fix bug #109: preserve privacy setting from Delicious export files
+  (Thanks to David Glenck)
+- Fix bug #110: Document solution for "searching slashes"
+- Fix bug #111: Comments in config.php mention *.inc.php files
+  (José María Mateos [rinze])
+- Fix bug: Do not use eregi functions anymore
+     </changelog>
+
+     <changelog version="0.98.4" date="2012-01-21" license="GPL">
+- Fix bug #3439729: URLs were escaped too often in bookmark list
+- Fix bug: Subtitle was not escaped
+- Fix bug #3388219: Incorrect URL when cancelling tag2tag-actions
+- Fix bug #3393951: Logo images missing on bookmark page
+- Fix bug #3399815: PHP error in opensearch API in 0.98.3
+- Fix bug #3407728: Can't delete users from admin page
+- Fix bug #3431742: open_basedir problems with /etc/ config files
+- Fix bug #3436624: Wrong URL for Delicious API when importing
+- Fix bug #3463481: RSS feed show warnings in feedvalidator.org
+- Fix bug #3384416: Use URL with protocol in bookmarklet
+- Fix bug: Invalid HTML when website thumbnails are activated
+- Fix bug #3413459: Thumbnails not in one line
+- Fix bug #3468293: Delicious import does not preserve private links
+- Fix bug #3396727: Title of http://lesscss.org/ not loaded
+- Fix bug #3111254: getIdFromUser() always returns an integer now (part 2)
+- Implement request #3403609: fr_CA translation update
+- Implement patch #3476011: PostgreSQL tables can not be initialized
+  (Frédéric Fauberteau [triaxx])
+     </changelog>
+
+     <!-- 0.98.3 was not needed -->
+
+     <changelog version="0.98.2" date="2011-08-08" license="GPL">
+- Fix bug #3385724: Rename tag ends with XML Parsing Error
+- Fix bug #3386178: "system:unfiled" secret tag does not work
+- Fix bug #3384416: Update documentation to explain HTTP/HTTPS root problem
+- Fix bug #3382126: Linked tags does not work for tags with spaces
+- Fix delicious API help page link
+     </changelog>
+
+     <changelog version="0.98.1" date="2011-08-01" license="GPL">
+- Fix bug #3375635: XML parsing problem in top.inc.php
+- Fix bug #3375428: Forgot to remove some old dojo files
+- Fix bug #3160512: Make SemanticScuttle work with FastCGI
+- Fix bug #3376618: Broken tag completion for private bookmarks
+     </changelog>
+
+     <changelog version="0.98.0" date="2011-07-21" license="GPL">
+- Switch to jQuery and drop dojo
+- Implement request #2928950: Private keys for RSS feeds (Mark Pemberton)
+- Implement request #3164348: Configurable default privacy (Brett Dee)
+- Implement request #1989987: Theming support
+- Implement request #3054906: Show user's full name instead of nickname
+- Implement patch #3059829: update ``FR_CA`` translation
+- Fix bug #3187177: Wrong URL / Export XML Bookmarks
+- Fix bug #3097187: Using opensearch with two tags does not work in Firefox
+- Fix bug #3251877: French translation JavaScript Bug when editing bookmarks
+- Fix bug #3168521: Title of tag-filtered RSS Feed is broken
+- Fix bug #2853627: Javascript warning
+- Fix bug in ``getTagsForBookmarks()`` that fetched all tags
+- Fix privacy issue when fetching tags of several users
+- Fix Google custom search XML
+- Show error message on mysqli connection errors
+- Update php-gettext library to 1.0.10
+- ``api/posts/add`` respects the 'replace' parameter now
+- Only URLs with an allowed protocol may be added to the database
+- Support HTTPS connections when ``$root`` is not configured
+- SQL schema version table to ease future database upgrades
+- Documentation is written with rST (reStructuredText) now
+- Support per-host configuration files
+     </changelog>
+
+     <changelog version="0.97.0" date="2010-06-09" license="GPL">
+- Many SQL optimizations - SemanticScuttle shows bookmarks 4 times faster now
+- New config option to skip "SET NAMES UTF8" call: $dbneedssetnames
+- Do not highlight admin bookmarks when $enableAdminColors is disabled
+- Add russian translation
+- Make HTML export follow the specifications a bit better
+- Fix bug #2953732: faulty error message for duplicate bookmarks
+- Fix bug #2960663: do not send content-type headers twice for ajax/api scripts
+- Fix bug #2976593: fr_FR locale is vietnamese
+     </changelog>
+
+     <!-- <dirroles key="bin">script</dirroles> -->
+     <!-- <replacement path="bin/doctrine" type="pear-config" from="@php_bin@" to="php_bin" /> -->
+     <!-- <release>
+            <install as="doctrine" name="bin/doctrine" />
+            -->
+   </d51pearpkg2>
+
+   <!-- time to fix the package.xml file since the task does not
+        allow everything we need:
+        - strip the base directory names like src, data and www
+        - remove that dumb baseinstalldir from files
+        - md5sums are generated automatically when packaging
+   -->
+   <!-- yes, we need to generate a 2nd file and move it back -->
+   <copy file="package.xml" tofile="package2.xml" overwrite="true">
+    <filterchain>
+     <replaceregexp>
+      <!-- remove md5sums -->
+      <regexp
+       pattern="md5sum=&quot;[a-z0-9]{32}&quot; "
+       replace=""
+       />
+      <!-- remove baseinstalldir for files -->
+      <regexp
+       pattern="&lt;file baseinstalldir=&quot;/&quot;"
+       replace="&lt;file"
+       />
+      <!-- install-as for different directories -->
+      <regexp
+       pattern="(&lt;file name=&quot;data/(.+?)&quot;)"
+       replace="\1 install-as=&quot;\2&quot;"
+       />
+      <regexp
+       pattern="(&lt;file name=&quot;doc/(.+?)&quot;)"
+       replace="\1 install-as=&quot;\2&quot;"
+       />
+      <regexp
+       pattern="(&lt;file name=&quot;tests/(.+?)&quot;)"
+       replace="\1 install-as=&quot;\2&quot;"
+       />
+      <regexp
+       pattern="(&lt;file name=&quot;www/(.+?)&quot;)"
+       replace="\1 install-as=&quot;SemanticScuttle/\2&quot;"
+       />
+      <regexp
+       pattern="(&lt;file name=&quot;src/(.+?)&quot;)"
+       replace="\1 install-as=&quot;\2&quot;"
+       />
+     </replaceregexp>
+    </filterchain>
+   </copy>
+   <move file="package2.xml" tofile="package.xml" overwrite="true" />
+
+   <!-- package up -->
+   <exec command="pear package" passthru="true" />
+   <move file="${pkgfile}" todir="dist/pear/" />
+
+   <delete file="package.xml" failonerror="true" />
+  </target>
+
+
+  <target name="build-docs" description="render documentation">
+   <rST format="html" uptodate="true"
+        toolparam="--stylesheet=res/docs/style.css"
+        >
+    <fileset refid="fs.doc"/>
+    <mapper type="regexp" from="^doc/(.+?)(.rst|.txt)?$" to="dist/docs/\1.html"/>
+<!--
+    <filterchain>
+     <replacetokenswithfile dir="res/docs">
+      <
+     </replacetokenswithfile>
+    </filterchain>
+-->
+   </rST>
+  </target>
+
+  <target name="clean-docs" description="delete rendered documentation files">
+   <delete dir="dist/docs" includeemptydirs="yes"/>
+  </target>
+
+
+  <target name="release" depends="check,zip,package,deploy-sf"
+   description="Release the version on sourceforge"
+   >
+   <!-- meta-target -->
+  </target>
+
+
+  <!--
+  /home/frs/project/s/se/semanticscuttle/SemanticScuttle/v0.94/
+  /home/frs/project/s/se/semanticscuttle/SemanticScuttle/v0.94/SemanticScuttle-v0.94.zip
+  /home/frs/project/s/se/semanticscuttle/SemanticScuttle/v0.94/SemanticScuttle-v0.94.1.zip
+  https://sourceforge.net/apps/trac/sourceforge/wiki/Release%20files%20for%20download
+  -->
+  <target name="deploy-sf" depends="check,zip"
+   description="Upload release to sourceforge"
+   >
+    <delete dir="dist/deploy-sf" /><!-- make empty -->
+    <mkdir dir="dist/deploy-sf" />
+    <mkdir dir="dist/deploy-sf/v${version-m}" />
+    <copy file="${distfile}" tofile="dist/deploy-sf/v${version-m}/${zipfile}"/>
+    <!-- test
+    <exec command="rsync -av dist/deploy-sf/ /tmp/test/" escape="false" />
+    -->
+    <exec
+     command="rsync -av -e ssh dist/deploy-sf/ ${sfuser},${sfproject}@frs.sourceforge.net:/home/frs/project/${sffilepath}/${sfproject}/"
+     escape="false" checkreturn="false"
+     />
+    <!-- rsync always returns code 23 on sourceforge releases, so we
+         can't check return values -->
+  </target>
+
+
+
+  <target name="deploy-sf-pear" depends="check,package"
+   description="Update PEAR channel + website on sourceforge"
+   >
+    <available file="${websitedir}"
+     type="dir" property="available.websitedir"
+     />
+    <fail unless="available.websitedir"
+     message="Website directory not set"
+     />
+    <!--
+        1. rsync channel data from sourceforge to local, deleting
+           superfluous channel files. Need to do that so pirum knows
+           all previous releases when adding the new package
+        2. update channel with pirum update
+        3. rsync to sourceforge
+    -->
+    <exec
+     command="rsync --include-from=.rsync-include-files --delete -avP -e ssh ${sfuser},${sfproject}@web.sourceforge.net:htdocs/ ."
+     dir="${websitedir}"
+     escape="false" checkreturn="false"
+     passthru="true"
+     />
+
+    <exec
+     command="pirum add ${websitedir} ${distpkgfile}"
+     passthru="true"
+     />
+    <!-- fix the generated html -->
+   <!-- yes, we need to generate a 2nd file and move it back -->
+   <copy file="${websitedir}/index.html" tofile="${websitedir}/pirum.html" overwrite="true">
+    <filterchain>
+     <replaceregexp>
+      <!-- make meta links relative -->
+      <regexp
+       pattern="href=&quot;http://semanticscuttle.sourceforge.net/"
+       replace="href=&quot;"
+       />
+      <!-- add sourceforge logo -->
+      <regexp
+       pattern="powered by "
+       replace="powered by ${html.sflogo} and "
+       />
+     </replaceregexp>
+    </filterchain>
+   </copy>
+
+   <!-- overwrite pirum generated index with our own -->
+   <copy file="${websitedir}/our-index.html" tofile="${websitedir}/index.html" overwrite="true" />
+
+   <!-- add our custom css -->
+   <append
+    destFile="${websitedir}/pirum.css"
+    file="${websitedir}/pirum-custom.css"
+    />
+
+    <!-- rsync always returns code 23 on sourceforge releases, so we
+         can't check return values -->
+    <exec
+     command="rsync --include-from=.rsync-include-files -avP -e ssh . ${sfuser},${sfproject}@web.sourceforge.net:htdocs/"
+     dir="${websitedir}"
+     escape="false" checkreturn="false"
+     passthru="true"
+     />
+  </target>
+
+
+  <target name="deploy-docs" depends="build-docs"
+          description="sync docs to sourceforge website"
+  >
+   <copy todir="${websitedir}/docs">
+    <fileset dir="dist/docs">
+     <include name="**"/>
+    </fileset>
+   </copy>
+
+   <exec
+     command="rsync -avP -e ssh . ${sfuser},${sfproject}@web.sourceforge.net:htdocs/docs"
+     dir="${websitedir}/docs"
+     escape="false" checkreturn="false"
+     passthru="true"
+     />
+  </target>
+
+
+  <target name="deploy-demo"
+          description="sync demo to sourceforge website"
+  >
+   <exec
+     command="rsync -avP -e ssh . ${sfuser},${sfproject}@web.sourceforge.net:htdocs/demo"
+     dir="${websitedir}/demo"
+     escape="false" checkreturn="false"
+     passthru="true"
+     />
+  </target>
+
+
+
+
+  <target name="check"
+   description="Check variables"
+   >
+    <fail unless="version" message="Version not defined!" />
+    <fail unless="sfuser" message="Sourceforge username not defined!" />
+    <fail unless="sfproject" message="Sourceforge project name not defined!" />
+    <fail unless="sffilepath" message="Sourceforge project file path not defined!" />
+
+    <mkdir dir="dist" />
+  </target>
+
+</project>

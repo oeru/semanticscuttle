@@ -285,8 +285,7 @@ class sql_db
 			unset($this->row[$query_id]);
 
 			$result = array();
-			$id = (int)$query_id;
-			while ($this->rowset[$id] = $this->sql_fetchrow($id))
+			while ($this->rowset[$query_id] = $this->sql_fetchrow($query_id))
 			{
 				$result[] = $this->rowset[$query_id];
 			}

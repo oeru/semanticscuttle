@@ -115,7 +115,7 @@ class SemanticScuttle_Service_User extends SemanticScuttle_DbService
         }
     }
 
-    function &getUsers($nb=0) {
+    function & getUsers($nb=0) {
         $query = 'SELECT * FROM '. $this->getTableName() .' ORDER BY `uId` DESC';
         if($nb>0) {
             $query .= ' LIMIT 0, '.$nb;
@@ -743,7 +743,7 @@ class SemanticScuttle_Service_User extends SemanticScuttle_DbService
 
         // Execute the statement.
         $this->db->sql_transaction('begin');
-        if (!($dbresult =  $this->db->sql_query($sql))) {
+        if (!($dbresult = $this->db->sql_query($sql))) {
             $this->db->sql_transaction('rollback');
             message_die(
                 GENERAL_ERROR, 'Could not insert user',
@@ -826,7 +826,7 @@ class SemanticScuttle_Service_User extends SemanticScuttle_DbService
 
         // Execute the statement.
         $this->db->sql_transaction('begin');
-        if (!($dbresult =  $this->db->sql_query($sql))) {
+        if (!($dbresult = $this->db->sql_query($sql))) {
             $this->db->sql_transaction('rollback');
             message_die(
                 GENERAL_ERROR, 'Could not update user', '',
@@ -872,7 +872,7 @@ class SemanticScuttle_Service_User extends SemanticScuttle_DbService
     function deleteUser($uId) {
         $query = 'DELETE FROM '. $this->getTableName() .' WHERE uId = '. intval($uId);
 
-        if (!($dbresult =  $this->db->sql_query($query))) {
+        if (!($dbresult = $this->db->sql_query($query))) {
             message_die(GENERAL_ERROR, 'Could not delete user', '', __LINE__, __FILE__, $query, $this->db);
             return false;
         }

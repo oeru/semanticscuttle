@@ -41,7 +41,7 @@ function filter($data, $type = NULL) {
 		}
 	} else if (is_array($data)) {
 		foreach(array_keys($data) as $key) {
-			$row = $data[$key];
+			$row =& $data[$key];
 			$row = filter($row, $type);
 		}
 	}
@@ -86,7 +86,7 @@ function getSortOrder($override = NULL) {
 function multi_array_search($needle, $haystack) {
 	if (is_array($haystack)) {
 		foreach(array_keys($haystack) as $key) {
-			$value = $haystack[$key];
+			$value =& $haystack[$key];
 			$result = multi_array_search($needle, $value);
 			if (is_array($result)) {
 				$return = $result;
@@ -275,5 +275,18 @@ function message_die($msg_code, $msg_text = '', $msg_title = '', $err_line = '',
 
 	echo "<html>\n<body>\n". $msg_title ."\n<br /><br />\n". $msg_text ."</body>\n</html>";
 	exit;
+}
+
+/**
+ * Calls reset() on the given arg, without the E_STRICT error
+ * "Only variables should be passed by reference"
+ *
+ * @param array $arg Array to return first element of
+ *
+ * @return mixed First element of the array
+ */
+function rreset($array)
+{
+    return reset($array);
 }
 ?>
