@@ -181,8 +181,8 @@ ul#navigation {
     left: 249px;
 }
 ul#navigation a {
-    font-size: 120%;
-    font-weight: bold;
+    /*font-size: 100%;
+    font-weight: bold;*/
     padding: 4px 4px 4px 4px;
 }
 ul#navigation a:hover {
@@ -192,7 +192,12 @@ ul#navigation a:hover {
 ul#navigation li {
     float: left;
     margin: 0;
-    padding: px;
+    font-size: 100%;
+    font-weight: bold;
+    padding: 0px;
+}
+ul#navigation li.label {
+  width: 30px;
 }
 ul#navigation li.access {
     float: left;
@@ -382,7 +387,7 @@ div#sidebar>div {
 div#sidebar h2 {
     background: transparent;
     border: 0;
-    color: #995;
+    color: #ED9E15;
     /*letter-spacing: 0;*/
     margin: 0;
     padding: 0.5em 0;
